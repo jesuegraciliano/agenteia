@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const pergunta = input.value.trim();
         if (!pergunta) return;
 
+        // Exibe a pergunta do usuário no chat
         chatBox.innerHTML += `<p><strong>Você:</strong> ${pergunta}</p>`;
         input.value = "";
 
