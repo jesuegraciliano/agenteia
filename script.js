@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Esta é a URL do nó "Webhook" no seu workflow do n8n.
     // Exemplo: https://sua_instancia_n8n.com/webhook/ce395e45-2442-44f2-9a0e-045721a7b99f/chat
     // Você precisa ter certeza que seu n8n está acessível publicamente para isso funcionar.
-    const N8N_WEBHOOK_URL = "https://myn8n.example.com/webhook/ce395e45-2442-44f2-9a0e-045721a7b99f/chat"; 
+    const N8N_WEBHOOK_URL = "https://hook.jesue.site/webhook/chat";
 
     // Função para adicionar uma mensagem ao chat
     function addMessage(sender, text) {
