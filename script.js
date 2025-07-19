@@ -1,44 +1,35 @@
-const form = document.querySelector("form");
-const input = document.querySelector("input");
-const chat = document.querySelector("ul");
-
-form.addEventListener("submit", async (e) => {
+document.getElementById('chat-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  const input = document.getElementById('user-input');
   const pergunta = input.value.trim();
-  if (pergunta === "") return;
+  if (!pergunta) return;
 
-  // Mostrar a pergunta no chat
-  const msgUsuario = document.createElement("li");
-  msgUsuario.innerHTML = `<strong>Você:</strong> ${pergunta}`;
-  chat.appendChild(msgUsuario);
-
-  // Resetar campo de entrada
-  input.value = "";
-
-  // Mostrar mensagem de carregando
-  const msgIA = document.createElement("li");
-  msgIA.innerHTML = `<strong>Agente IA:</strong> <em>pensando...</em>`;
-  chat.appendChild(msgIA);
+  appendMessage('Você', pergunta, 'user');
+  input.value = '';
 
   try {
-    const resposta = await fetch("https://editor.jesue.site/webhook/chat", {
-      method: "POST",
+    const response = await fetch('https://editor.jesue.site/webhook/webhook_chat', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        message: pergunta
-      })
+      body: JSON.stringify({ pergunta })
     });
 
-    const respostaTexto = await resposta.text();
-
-    msgIA.innerHTML = `<strong>Agente IA:</strong> ${respostaTexto}`;
-  } catch (erro) {
-    msgIA.innerHTML = `<strong>Agente IA:</strong> <span style="color: red;">Erro ao acessar o agente: ${erro.message}</span>`;
+    const data = await response.json();
+    const resposta = data.output || 'Erro: resposta vazia do agente.';
+    appendMessage('Agente IA', resposta, 'bot');
+  } catch (error) {
+    appendMessage('Agente IA', `Erro ao acessar o agente: ${error.message}`, 'bot');
   }
-
-  // Rolar até a última mensagem
-  chat.scrollTop = chat.scrollHeight;
 });
+
+function appendMessage(nome, texto, classe) {
+  const chatBox = document.getElementById('chat-box');
+  const msgDiv = document.createElement('div');
+  msgDiv.classList.add('message', classe);
+  msgDiv.innerHTML = `<strong>${nome}:</strong> ${texto}`;
+  chatBox.appendChild(msgDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
