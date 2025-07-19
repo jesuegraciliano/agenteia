@@ -7,11 +7,18 @@ document.getElementById("chat-form").addEventListener("submit", async function (
     const resposta = await fetch("https://hook.jesue.site/webhook/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pergunta: userInput }) // ajuste conforme seu webhook
-});
+      body: JSON.stringify({ pergunta: userInput })
+    });
 
     const dados = await resposta.json();
-    addMessage("Agente IA", dados.resposta || "Resposta não encontrada.");
+
+    // Garante que existe 'resposta' no retorno
+    if (dados && dados.resposta) {
+      addMessage("Agente IA", dados.resposta);
+    } else {
+      addMessage("Agente IA", "Resposta não encontrada no servidor.");
+    }
+
   } catch (erro) {
     addMessage("Agente IA", "Erro ao acessar o agente. Tente novamente mais tarde.");
   }
@@ -24,5 +31,4 @@ function addMessage(remetente, texto) {
   const p = document.createElement("p");
   p.innerHTML = `<strong>${remetente}:</strong> ${texto}`;
   chatBox.appendChild(p);
-  chatBox.scrollTop = chatBox.scrollHeight;
 }
