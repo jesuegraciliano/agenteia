@@ -8,7 +8,7 @@ document.getElementById("chat-form").addEventListener("submit", async function (
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ pergunta: userInput }) // ajuste conforme seu webhook
-    });
+});
 
     const dados = await resposta.json();
     addMessage("Agente IA", dados.resposta || "Resposta não encontrada.");
