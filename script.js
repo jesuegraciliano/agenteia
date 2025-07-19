@@ -13,8 +13,8 @@ document.getElementById("chat-form").addEventListener("submit", async function (
     const dados = await resposta.json();
 
     // Garante que existe 'resposta' no retorno
-    if (dados && dados.resposta) {
-      addMessage("Agente IA", dados.resposta);
+    if (dados && dados.texto) {
+      addMessage("Agente IA", dados.texto);
     } else {
       addMessage("Agente IA", "Resposta não encontrada no servidor.");
     }
