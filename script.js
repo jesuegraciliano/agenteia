@@ -4,7 +4,7 @@ document.getElementById("chat-form").addEventListener("submit", async function (
   addMessage("Você", userInput);
 
   try {
-    const resposta = await fetch("https://jesuegraciliano.n8n.cloud/webhook/chat", {
+    const resposta = await fetch("https://editor.jesue.site/webhook-test/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ pergunta: userInput }) // ajuste conforme seu webhook
