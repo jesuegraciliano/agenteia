@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("chat-form");
-    const input = document.getElementById("pergunta");
+    const input = document.getElementById("user-input"); // Corrigido aqui
     const chatBox = document.getElementById("chat-box");
 
     form.addEventListener("submit", async function (e) {
@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const pergunta = input.value.trim();
         if (!pergunta) return;
 
-        // Exibe a pergunta do usuário no chat
+        // Mostra a pergunta do usuário
         chatBox.innerHTML += `<p><strong>Você:</strong> ${pergunta}</p>`;
         input.value = "";
 
@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await response.json();
 
+            // Mostra a resposta do agente
             if (data.output) {
                 chatBox.innerHTML += `<p><strong>Agente IA:</strong> ${data.output}</p>`;
             } else {
