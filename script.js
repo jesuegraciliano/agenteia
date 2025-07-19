@@ -8,11 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const pergunta = input.value.trim();
         if (!pergunta) return;
 
-        // Exibe a pergunta no chat
-        const perguntaHTML = `<p><strong>Você:</strong> ${pergunta}</p>`;
-        chatBox.innerHTML += perguntaHTML;
-
-        // Limpa o campo de input
+        chatBox.innerHTML += `<p><strong>Você:</strong> ${pergunta}</p>`;
         input.value = "";
 
         try {
@@ -26,19 +22,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await response.json();
 
-            // Verifica se há resposta
             if (data.output) {
-                const respostaHTML = `<p><strong>Agente IA:</strong> ${data.output}</p>`;
-                chatBox.innerHTML += respostaHTML;
+                chatBox.innerHTML += `<p><strong>Agente IA:</strong> ${data.output}</p>`;
             } else {
-                chatBox.innerHTML += `<p><strong>Agente IA:</strong> Ocorreu um erro ao obter resposta.</p>`;
+                chatBox.innerHTML += `<p><strong>Agente IA:</strong> Nenhuma resposta recebida.</p>`;
             }
-
         } catch (error) {
             chatBox.innerHTML += `<p><strong>Erro:</strong> ${error.message}</p>`;
         }
 
-        // Rolagem automática para a última mensagem
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 });
