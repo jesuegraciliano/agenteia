@@ -1,38 +1,53 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("chat-form");
-    const input = document.getElementById("user-input"); // Corrigido aqui
-    const chatBox = document.getElementById("chat-box");
+  const form = document.querySelector("form");
+  const input = document.querySelector("input");
+  const chatContainer = document.querySelector(".chat");
 
-    form.addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const pergunta = input.value.trim();
-        if (!pergunta) return;
+  // Função para adicionar mensagens no chat
+  function adicionarMensagem(remetente, mensagem) {
+    const p = document.createElement("p");
+    p.innerHTML = `<strong>${remetente}:</strong> ${mensagem}`;
+    chatContainer.appendChild(p);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
 
-        // Mostra a pergunta do usuário
-        chatBox.innerHTML += `<p><strong>Você:</strong> ${pergunta}</p>`;
-        input.value = "";
+  // Envio do formulário
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-        try {
-            const response = await fetch("https://editor.jesue.site/webhook/chat", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ pergunta: pergunta })
-            });
+    const perguntaUsuario = input.value.trim();
+    if (perguntaUsuario === "") return;
 
-            const data = await response.json();
+    adicionarMensagem("Você", perguntaUsuario);
+    input.value = "";
 
-            // Mostra a resposta do agente
-            if (data.output) {
-                chatBox.innerHTML += `<p><strong>Agente IA:</strong> ${data.output}</p>`;
-            } else {
-                chatBox.innerHTML += `<p><strong>Agente IA:</strong> Nenhuma resposta recebida.</p>`;
-            }
-        } catch (error) {
-            chatBox.innerHTML += `<p><strong>Erro:</strong> ${error.message}</p>`;
+    // Envia para o webhook do N8N
+    fetch("https://jesue.site/webhook/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        chatInput: perguntaUsuario
+      })
+    })
+      .then(response => {
+        // Tenta transformar a resposta em JSON
+        if (!response.ok) {
+          throw new Error(`Erro HTTP: ${response.status}`);
         }
-
-        chatBox.scrollTop = chatBox.scrollHeight;
-    });
+        return response.json();
+      })
+      .then(data => {
+        if (data.output) {
+          adicionarMensagem("Agente IA", data.output);
+        } else {
+          adicionarMensagem("Agente IA", "Nenhuma resposta recebida.");
+        }
+      })
+      .catch(error => {
+        console.error("Erro ao comunicar com o N8N:", error);
+        adicionarMensagem("Erro", "Falha ao obter resposta do servidor.");
+      });
+  });
 });
