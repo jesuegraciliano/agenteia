@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- Cabeçalho com logotipo e título -->
+  <!-- Cabeçalho com logotipo empilhado acima do título -->
   <header class="chat-header">
     <img src="logo-ifsc (1).png" alt="Logotipo IFSC" class="logo-ifsc" />
     <h1>Chatbot Inteligência Artificial - IFSC</h1>
@@ -30,17 +30,12 @@
       const userInput = document.getElementById('user-input');
       const sendButton = document.getElementById('send-button');
       const chatMessages = document.getElementById('chat-messages');
-
       const N8N_WEBHOOK_URL = "https://hook.jesue.site/webhook/aula";
 
       function addMessage(sender, text) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message');
-        if (sender === 'user') {
-          messageDiv.classList.add('user-message');
-        } else {
-          messageDiv.classList.add('bot-message');
-        }
+        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
         messageDiv.textContent = text;
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -50,15 +45,15 @@
 
       async function sendMessage() {
         const question = userInput.value.trim();
-        if (question === '') return;
+        if (!question) return;
 
         addMessage('user', question);
         userInput.value = '';
         userInput.disabled = true;
         sendButton.disabled = true;
 
-        if (!N8N_WEBHOOK_URL || N8N_WEBHOOK_URL === "SUA_URL_DO_WEBHOOK_DO_N8N_AQUI") {
-          addMessage('bot', 'ERRO: A URL do webhook do n8n não foi configurada. Por favor, edite o script.');
+        if (!N8N_WEBHOOK_URL) {
+          addMessage('bot', 'ERRO: Webhook do n8n não configurado.');
           userInput.disabled = false;
           sendButton.disabled = false;
           return;
@@ -67,23 +62,21 @@
         try {
           const response = await fetch(N8N_WEBHOOK_URL, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ pergunta: question, sessionId: sessionId })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pergunta: question, sessionId })
           });
 
           const data = await response.json();
 
           if (response.ok) {
-            addMessage('bot', data.output || 'Desculpe, não consegui obter uma resposta do AI.');
+            addMessage('bot', data.output || 'Desculpe, não consegui obter uma resposta.');
           } else {
-            addMessage('bot', `Erro: ${data.error || 'Não foi possível obter uma resposta.'}`);
+            addMessage('bot', `Erro: ${data.error || 'Resposta não recebida.'}`);
           }
 
         } catch (error) {
-          console.error('Erro ao comunicar com o n8n webhook:', error);
-          addMessage('bot', 'Ocorreu um erro ao tentar conectar com o serviço de IA. Verifique sua conexão ou a URL do n8n.');
+          console.error('Erro ao comunicar com o webhook:', error);
+          addMessage('bot', 'Erro ao tentar conectar com o serviço de IA.');
         } finally {
           userInput.disabled = false;
           sendButton.disabled = false;
@@ -92,15 +85,13 @@
       }
 
       sendButton.addEventListener('click', sendMessage);
-
-      userInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-          sendMessage();
-        }
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
       });
 
       addMessage('bot', 'Olá! Sou o chatbot do curso de IA. Como posso ajudar você hoje?');
     });
   </script>
+
 </body>
 </html>
