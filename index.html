@@ -1,22 +1,106 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot do Curso de IA</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chatbot IFSC</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="chat-container">
-        <h1>Chatbot do Curso de IA</h1>
-        <div class="chat-messages" id="chat-messages">
-            </div>
-        <div class="chat-input-area">
-            <input type="text" id="user-input" placeholder="Pergunte sobre o curso...">
-            <button id="send-button">Enviar</button>
-        </div>
-    </div>
 
-    <script src="script.js"></script>
+  <!-- Cabeçalho com logotipo e título -->
+  <header class="chat-header">
+    <img src="logo-ifsc (1).png" alt="Logotipo IFSC" class="logo-ifsc" />
+    <h1>Chatbot Inteligência Artificial - IFSC</h1>
+  </header>
+
+  <!-- Container principal do chat -->
+  <div class="chat-container">
+    <div id="chat-messages" class="chat-messages"></div>
+
+    <div class="chat-input-area">
+      <input type="text" id="user-input" placeholder="Digite sua pergunta aqui..." />
+      <button id="send-button">Enviar</button>
+    </div>
+  </div>
+
+  <!-- Script principal -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const userInput = document.getElementById('user-input');
+      const sendButton = document.getElementById('send-button');
+      const chatMessages = document.getElementById('chat-messages');
+
+      const N8N_WEBHOOK_URL = "https://hook.jesue.site/webhook/aula";
+
+      function addMessage(sender, text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        if (sender === 'user') {
+          messageDiv.classList.add('user-message');
+        } else {
+          messageDiv.classList.add('bot-message');
+        }
+        messageDiv.textContent = text;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      const sessionId = `session_${Date.now()}`;
+
+      async function sendMessage() {
+        const question = userInput.value.trim();
+        if (question === '') return;
+
+        addMessage('user', question);
+        userInput.value = '';
+        userInput.disabled = true;
+        sendButton.disabled = true;
+
+        if (!N8N_WEBHOOK_URL || N8N_WEBHOOK_URL === "SUA_URL_DO_WEBHOOK_DO_N8N_AQUI") {
+          addMessage('bot', 'ERRO: A URL do webhook do n8n não foi configurada. Por favor, edite o script.');
+          userInput.disabled = false;
+          sendButton.disabled = false;
+          return;
+        }
+
+        try {
+          const response = await fetch(N8N_WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ pergunta: question, sessionId: sessionId })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            addMessage('bot', data.output || 'Desculpe, não consegui obter uma resposta do AI.');
+          } else {
+            addMessage('bot', `Erro: ${data.error || 'Não foi possível obter uma resposta.'}`);
+          }
+
+        } catch (error) {
+          console.error('Erro ao comunicar com o n8n webhook:', error);
+          addMessage('bot', 'Ocorreu um erro ao tentar conectar com o serviço de IA. Verifique sua conexão ou a URL do n8n.');
+        } finally {
+          userInput.disabled = false;
+          sendButton.disabled = false;
+          userInput.focus();
+        }
+      }
+
+      sendButton.addEventListener('click', sendMessage);
+
+      userInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+          sendMessage();
+        }
+      });
+
+      addMessage('bot', 'Olá! Sou o chatbot do curso de IA. Como posso ajudar você hoje?');
+    });
+  </script>
 </body>
 </html>
