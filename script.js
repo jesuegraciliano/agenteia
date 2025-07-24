@@ -7,7 +7,7 @@
 </head>
 <body>
     <header class="cabecalho">
-        <img src="logo-ifsc (1).png" alt="Logotipo IFSC" class="logo-ifsc">
+        <img src="logo-ifsc.png" alt="Logotipo IFSC" class="logo-ifsc">
         <h1>Chatbot Inteligência Artificial - IFSC</h1>
     </header>
 
