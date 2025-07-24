@@ -8,23 +8,25 @@
 </head>
 <body>
 
-  <!-- Cabeçalho com logotipo empilhado acima do título -->
-  <header class="chat-header">
-    <img src="logo-ifsc (1).png" alt="Logotipo IFSC" class="logo-ifsc" />
-    <h1>Chatbot Inteligência Artificial - IFSC</h1>
-  </header>
+  <div class="app-container">
 
-  <!-- Container principal do chat -->
-  <div class="chat-container">
-    <div id="chat-messages" class="chat-messages"></div>
+    <!-- Cabeçalho -->
+    <header class="chat-header">
+      <img src="logo-ifsc.png" alt="Logotipo IFSC" class="logo-ifsc" />
+      <h1>Chatbot Inteligência Artificial - IFSC</h1>
+    </header>
 
-    <div class="chat-input-area">
-      <input type="text" id="user-input" placeholder="Digite sua pergunta aqui..." />
-      <button id="send-button">Enviar</button>
+    <!-- Chat -->
+    <div class="chat-container">
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-area">
+        <input type="text" id="user-input" placeholder="Digite sua pergunta aqui..." />
+        <button id="send-button">Enviar</button>
+      </div>
     </div>
+
   </div>
 
-  <!-- Script principal -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const userInput = document.getElementById('user-input');
@@ -51,13 +53,6 @@
         userInput.value = '';
         userInput.disabled = true;
         sendButton.disabled = true;
-
-        if (!N8N_WEBHOOK_URL) {
-          addMessage('bot', 'ERRO: Webhook do n8n não configurado.');
-          userInput.disabled = false;
-          sendButton.disabled = false;
-          return;
-        }
 
         try {
           const response = await fetch(N8N_WEBHOOK_URL, {
