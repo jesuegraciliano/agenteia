@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // !!! IMPORTANTE: Substitua esta URL pela URL REAL do seu Webhook do n8n !!!
     // Ela deve ser: https://hook.jesue.site/webhook/chat
-    const N8N_WEBHOOK_URL = "https://hook.jesue.site/webhook/chat"; // <--- ESTA LINHA É CRÍTICA
+    const N8N_WEBHOOK_URL = "https://hook.jesue.site/webhook/aula"; // <--- ESTA LINHA É CRÍTICA
 
     // Função para adicionar uma mensagem ao chat
     function addMessage(sender, text) {
