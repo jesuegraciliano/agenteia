@@ -2,91 +2,89 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chatbot IFSC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Carga Térmica - NBR 16401</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <div class="app-container">
-
-    <!-- Cabeçalho -->
-    <header class="chat-header">
+  <main class="app">
+    <header class="topo">
       <img src="logo-ifsc.png" alt="Logotipo IFSC" class="logo-ifsc" />
-      <h1>Chatbot Inteligência Artificial - IFSC São José</h1>
+      <div>
+        <h1>Calculadora Didática de Carga Térmica</h1>
+        <p>Memorial passo a passo baseado em NBR 16401 (modelo simplificado).</p>
+      </div>
     </header>
 
-    <!-- Chat -->
-    <div class="chat-container">
-      <div id="chat-messages" class="chat-messages"></div>
-      <div class="chat-input-area">
-        <input type="text" id="user-input" placeholder="Digite sua pergunta aqui..." />
-        <button id="send-button">Enviar</button>
+    <section class="painel entrada" aria-label="Parâmetros de entrada">
+      <h2>Entradas do ambiente</h2>
+      <div class="grid">
+        <label>Largura (m)
+          <input id="largura" type="number" min="1" step="0.1" value="4" />
+        </label>
+        <label>Comprimento (m)
+          <input id="comprimento" type="number" min="1" step="0.1" value="5" />
+        </label>
+        <label>Pé-direito (m)
+          <input id="peDireito" type="number" min="2" step="0.1" value="2.8" />
+        </label>
+        <label>Pessoas (un)
+          <input id="pessoas" type="number" min="0" step="1" value="2" />
+        </label>
+        <label>Temperatura interna (°C)
+          <input id="tInt" type="number" min="18" max="28" step="0.1" value="24" />
+        </label>
+        <label>Temperatura externa de projeto (°C)
+          <input id="tExt" type="number" min="20" max="45" step="0.1" value="32.2" />
+        </label>
+        <label>Amplitude térmica diária (°C)
+          <input id="amplitude" type="number" min="1" max="20" step="0.1" value="8.5" />
+        </label>
+        <label>Área de fachada (m²)
+          <input id="areaFachada" type="number" min="1" step="0.1" value="14" />
+        </label>
+        <label>Área de vidro (m²)
+          <input id="areaVidro" type="number" min="0" step="0.1" value="3" />
+        </label>
+        <label>CLTD base (parede)
+          <input id="cltdBase" type="number" min="0" step="0.1" value="14" />
+        </label>
+        <label>SCL vidro
+          <input id="sclVidro" type="number" min="0" step="1" value="180" />
+        </label>
+        <label>SHGC vidro
+          <input id="shgc" type="number" min="0.1" max="1" step="0.01" value="0.87" />
+        </label>
+        <label>U da parede (W/m²K)
+          <input id="uParede" type="number" min="0.1" max="5" step="0.01" value="2.44" />
+        </label>
+        <label>U do vidro (W/m²K)
+          <input id="uVidro" type="number" min="0.1" max="8" step="0.1" value="5.8" />
+        </label>
+        <label>CAH (trocas/h)
+          <input id="cah" type="number" min="0" max="5" step="0.1" value="0.5" />
+        </label>
+        <label>Equip./luz (W/m²)
+          <input id="densidadeEquip" type="number" min="0" max="80" step="1" value="20" />
+        </label>
       </div>
-    </div>
+      <div class="acoes">
+        <button id="calcularBtn">Calcular</button>
+        <button id="imprimirBtn" class="secundario">Imprimir detalhamento</button>
+      </div>
+    </section>
 
-  </div>
+    <section class="painel" aria-live="polite">
+      <h2>Resultado resumido</h2>
+      <div id="resultado" class="resultado">Clique em <strong>Calcular</strong> para gerar o memorial.</div>
+    </section>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const userInput = document.getElementById('user-input');
-      const sendButton = document.getElementById('send-button');
-      const chatMessages = document.getElementById('chat-messages');
-      const N8N_WEBHOOK_URL = "https://hook.jesue.site/webhook/aula";
+    <section class="painel" id="memorialSecao">
+      <h2>Memorial detalhado (parcela por parcela)</h2>
+      <ol id="memorialLista" class="memorial"></ol>
+    </section>
+  </main>
 
-      function addMessage(sender, text) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-        messageDiv.textContent = text;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-
-      const sessionId = `session_${Date.now()}`;
-
-      async function sendMessage() {
-        const question = userInput.value.trim();
-        if (!question) return;
-
-        addMessage('user', question);
-        userInput.value = '';
-        userInput.disabled = true;
-        sendButton.disabled = true;
-
-        try {
-          const response = await fetch(N8N_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pergunta: question, sessionId })
-          });
-
-          const data = await response.json();
-
-          if (response.ok) {
-            addMessage('bot', data.output || 'Desculpe, não consegui obter uma resposta.');
-          } else {
-            addMessage('bot', `Erro: ${data.error || 'Resposta não recebida.'}`);
-          }
-
-        } catch (error) {
-          console.error('Erro ao comunicar com o webhook:', error);
-          addMessage('bot', 'Erro ao tentar conectar com o serviço de IA.');
-        } finally {
-          userInput.disabled = false;
-          sendButton.disabled = false;
-          userInput.focus();
-        }
-      }
-
-      sendButton.addEventListener('click', sendMessage);
-      userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-      });
-
-      addMessage('bot', 'Olá! Sou o chatbot do curso de IA EAD do IFSC. Fui criado pelo prof. Jesué para ajudar você. Qual sua dúvida?');
-    });
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
